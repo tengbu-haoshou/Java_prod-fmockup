@@ -1,0 +1,1 @@
+import{l as s}from"./materialdesignicons-85a25ac4.js";const o={__name:"valid",emits:["valid_event"],setup(n,{emit:a}){const e=a;return s.get("/session/valid").then(function(t){e("valid_event",t.data.status,t.data.message)}).catch(function(t){e("valid_event","","Network trouble has occurred.")}),(t,i)=>null}};export{o as _};

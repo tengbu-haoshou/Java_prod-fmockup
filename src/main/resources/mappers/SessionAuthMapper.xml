@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.xxxx.fmockup.mapper.SessionAuthMapper">
+	<select id="searchOneUser" parameterType="cn.com.xxxx.fmockup.validator.SessionAuthValidator" resultType="cn.com.xxxx.fmockup.entity.SessionAuthEntity">
+		SELECT USER_ID, USER_NAME, PASSWORD_AES, FAILED_COUNT, USER_LOCKED_F, DATEDIFF(DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'), LAST_CHANGE_PASSWORD_DATE) AS DURATION_DAYS
+			FROM FMOCKUP.M_USER_LIST
+			WHERE USER_NAME = #{userName}
+				AND DELETED_F = 'N'
+	</select>
+	<select id="searchOneUserForSession" resultType="cn.com.xxxx.fmockup.entity.SessionAuthEntity">
+		SELECT USER_LOCKED_F
+			FROM FMOCKUP.M_USER_LIST
+			WHERE USER_ID = #{userId}
+				AND DELETED_F = 'N'
+	</select>
+	<select id="searchOneUserTranCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+			FROM FMOCKUP.M_USER_LIST, FMOCKUP.M_USER_ROLE_LIST, FMOCKUP.M_ROLE_LIST, FMOCKUP.M_ROLE_TRAN_LIST, FMOCKUP.S_TRAN_LIST
+			WHERE M_USER_LIST.USER_ID = #{userId}
+				AND M_USER_LIST.DELETED_F = 'N'
+				AND M_USER_ROLE_LIST.DELETED_F = 'N'
+				AND M_ROLE_LIST.DELETED_F = 'N'
+				AND M_ROLE_TRAN_LIST.DELETED_F = 'N'
+				AND S_TRAN_LIST.DELETED_F = 'N'
+				AND S_TRAN_LIST.TRAN_NAME = #{tranName}
+				AND M_USER_LIST.USER_ID = M_USER_ROLE_LIST.USER_ID
+				AND M_USER_ROLE_LIST.ROLE_ID = M_ROLE_LIST.ROLE_ID
+				AND M_ROLE_LIST.ROLE_ID = M_ROLE_TRAN_LIST.ROLE_ID
+				AND M_ROLE_TRAN_LIST.TRAN_ID = S_TRAN_LIST.TRAN_ID
+	</select>
+	<update id="updateUserFailedCount">
+		UPDATE FMOCKUP.M_USER_LIST
+			SET FAILED_COUNT = FAILED_COUNT + 1,
+				LAST_LOGIN_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T')
+			WHERE USER_ID = #{userId}
+				AND DELETED_F = 'N'
+	</update>
+	<update id="resetUserFailedCount">
+		UPDATE FMOCKUP.M_USER_LIST
+			SET FAILED_COUNT = 0,
+				LAST_LOGIN_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T')
+			WHERE USER_ID = #{userId}
+				AND DELETED_F = 'N'
+	</update>
+</mapper>

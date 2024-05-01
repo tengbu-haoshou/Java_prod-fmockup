@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.xxxx.fmockup.mapper.RoleTranMapper">
+	<select id="searchAllRoleTrans" resultType="cn.com.xxxx.fmockup.entity.RoleTranEntity">
+		SELECT S_TRAN_LIST.TRAN_ID, S_TRAN_LIST.TRAN_NAME, CASE WHEN T.TRAN_ID IS NULL THEN 'false' ELSE 'true' END AS IS_EXISTS
+			FROM
+				FMOCKUP.S_TRAN_LIST
+				LEFT JOIN
+				(
+					SELECT S_TRAN_LIST.TRAN_ID
+						FROM FMOCKUP.M_ROLE_LIST, FMOCKUP.M_ROLE_TRAN_LIST, FMOCKUP.S_TRAN_LIST
+						WHERE M_ROLE_LIST.ROLE_ID = #{roleId}
+							AND M_ROLE_LIST.DELETED_F = 'N'
+							AND M_ROLE_LIST.ROLE_F = 'U'
+							AND M_ROLE_LIST.UPDATE_DATE = #{updateDate}
+							AND M_ROLE_TRAN_LIST.DELETED_F = 'N'
+							AND S_TRAN_LIST.DELETED_F = 'N'
+							AND M_ROLE_LIST.ROLE_ID = M_ROLE_TRAN_LIST.ROLE_ID
+							AND M_ROLE_TRAN_LIST.TRAN_ID = S_TRAN_LIST.TRAN_ID
+				) T (TRAN_ID)
+                ON S_TRAN_LIST.TRAN_ID = T.TRAN_ID
+			WHERE S_TRAN_LIST.ROLE_F = 'U'
+				AND S_TRAN_LIST.DELETED_F = 'N'
+			ORDER BY IS_EXISTS ASC, S_TRAN_LIST.TRAN_NAME ASC
+	</select>
+	<select id="searchOneRoleTranCount" parameterType="cn.com.xxxx.fmockup.validator.RoleTranValidator" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+			FROM (
+					SELECT 1 AS JOIN_KEY
+						FROM FMOCKUP.M_ROLE_LIST
+						WHERE ROLE_ID = #{roleId}
+							AND DELETED_F = 'N'
+				) AS T1,
+				(
+					SELECT 1 AS JOIN_KEY
+						FROM FMOCKUP.S_TRAN_LIST
+						WHERE TRAN_ID = #{tranId}
+							AND DELETED_F = 'N'
+				) AS T2
+			WHERE T1.JOIN_KEY = T2.JOIN_KEY
+	</select>
+	<insert id="insertRoleTran" parameterType="cn.com.xxxx.fmockup.validator.RoleTranValidator">
+		INSERT INTO FMOCKUP.M_ROLE_TRAN_LIST
+			( ROLE_ID, TRAN_ID, CREATE_DATE, UPDATE_DATE, DELETED_F )
+			VALUES( #{roleId}, #{tranId}, DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'), DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'), 'N')
+	</insert>
+	<update id="deleteRoleTran" parameterType="cn.com.xxxx.fmockup.validator.RoleTranValidator">
+		DELETE FROM FMOCKUP.M_ROLE_TRAN_LIST
+			WHERE ROLE_ID = #{roleId}
+				AND TRAN_ID = #{tranId}
+				AND DELETED_F = 'N'
+	</update>
+</mapper>

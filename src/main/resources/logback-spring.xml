@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE logback>
+<configuration>
+
+	<!-- xxxx environment -->
+	<springProfile name="xxxx">
+		<property name="logFilePath" value="d:/systems/fmockup/log/xxxx/" />
+		<property name="logFileName" value="fmockup" />
+　　	<property name="logLevel" value="INFO" />
+	</springProfile>
+
+	<!-- production environent -->
+	<springProfile name="production">
+ 		<property name="logFilePath" value="${LOG_PATH}/" />
+		<property name="accountLogFileName" value="fmockup-account" />
+		<property name="applicationLogFileName" value="fmockup-application" />
+　　	<property name="logLevel" value="INFO" />
+	</springProfile>
+
+	<!-- console output -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>fmockup stdout %d{yyyy/MM/dd HH:mm:ss} %-5level [%thread] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- account log -->
+	<appender name="ACCESS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<!--file name -->
+		<file>${logFilePath}${accountLogFileName}.log</file>
+
+		<!--log lotation -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logFilePath}${accountLogFileName}-%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+<!--		<maxHistory>180</maxHistory>  -->
+			<maxHistory>3</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+		</rollingPolicy>
+
+		<!--log output format -->
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>fmockup account %d{yyyy/MM/dd HH:mm:ss} %-5level [%thread] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- application log -->
+	<appender name="APPLICATION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<!--file name -->
+		<file>${logFilePath}${applicationLogFileName}.log</file>
+
+		<!--log lotation -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logFilePath}${applicationLogFileName}-%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+<!--		<maxHistory>180</maxHistory>  -->
+			<maxHistory>3</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+		</rollingPolicy>
+
+		<!--log output format -->
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>fmockup application %d{yyyy/MM/dd HH:mm:ss} %-5level [%thread] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- root -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<root level="INFO">
+		<appender-ref ref="APPLICATION_LOG" />
+	</root>
+
+	<!-- logger -->
+	<logger name="accountLogger" additivity="false" level="INFO">
+		<appender-ref ref="ACCESS_LOG" />
+	</logger>
+	<logger name="applicationLogger" additivity="false" level="INFO">
+		<appender-ref ref="APPLICATION_LOG" />
+	</logger>
+
+</configuration>

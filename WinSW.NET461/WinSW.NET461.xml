@@ -1,0 +1,10 @@
+<service>
+	<id>springboot.fmockup</id>
+	<name>System - fmockup</name>
+	<description>Service for fmockup.</description>
+	<logpath>D:\Systems\fmockup\log</logpath>
+	<executable>D:\Systems\fmockup\jdk-17.0.2\bin\java</executable>
+	<workingdirectory>D:\Systems\fmockup\lib</workingdirectory>
+	<arguments>-Xmx256m -classpath "D:\Systems\fmockup\jdk-17.0.2" -Dserver.port=8081 -Dproperty.home-directory-path="D:\Systems\fmockup" -jar "D:\Systems\fmockup\lib\fmockup-0.0.1.jar"</arguments>
+	<logmode>rotate</logmode>
+</service>

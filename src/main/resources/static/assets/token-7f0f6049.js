@@ -1,0 +1,1 @@
+import{l as o}from"./materialdesignicons-85a25ac4.js";const c={__name:"token",emits:["token_event"],setup(a,{emit:n}){const e=n;return o.get("/session/token").then(function(t){e("token_event",t.data.status,t.data.message,t.data.token)}).catch(function(t){e("token_event","","Network trouble has occurred.","")}),(t,s)=>null}};export{c as _};

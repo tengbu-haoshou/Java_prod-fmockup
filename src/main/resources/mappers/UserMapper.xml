@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.xxxx.fmockup.mapper.UserMapper">
+	<select id="searchAllUsers" resultType="cn.com.xxxx.fmockup.entity.UserEntity">
+		SELECT ROW_NUMBER() OVER (ORDER BY USER_NAME ASC) AS NO, USER_ID, USER_NAME, FAILED_COUNT, USER_LOCKED_F, DELETED_F, REMARK, ADD_USER_DATE, MODIFY_USER_DATE, UPDATE_DATE
+			FROM FMOCKUP.M_USER_LIST
+			WHERE ROLE_F = 'U'
+			ORDER BY USER_NAME ASC
+	</select>
+	<select id="searchOneUser" parameterType="cn.com.xxxx.fmockup.validator.UserValidator" resultType="cn.com.xxxx.fmockup.entity.UserEntity">
+		SELECT USER_NAME, REMARK
+			FROM FMOCKUP.M_USER_LIST
+			WHERE USER_ID = #{userId}
+				AND UPDATE_DATE = #{updateDate}
+				AND ROLE_F = 'U'
+				AND DELETED_F = 'N'
+	</select>
+	<insert id="insertUser" parameterType="cn.com.xxxx.fmockup.validator.UserValidator">
+		INSERT INTO FMOCKUP.M_USER_LIST
+			( USER_ID, USER_NAME, PASSWORD_AES, REMARK, ROLE_F, USER_LOCKED_F, FAILED_COUNT, LAST_LOGIN_DATE, LAST_CHANGE_PASSWORD_DATE, ADD_USER_DATE, MODIFY_USER_DATE, CREATE_DATE, UPDATE_DATE, DELETED_F )
+			VALUES( #{userId}, #{userName}, #{passwordAes}, #{remark}, 'U', 'Y', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'), '0000-00-00 00:00:00', DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'), DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'), 'N' )
+	</insert>
+	<update id="updateUserWithoutPassword" parameterType="cn.com.xxxx.fmockup.validator.UserValidatorForModify">
+		UPDATE FMOCKUP.M_USER_LIST
+			SET USER_NAME = #{userName},
+				REMARK = #{remark},
+				USER_LOCKED_F = 'Y',
+				FAILED_COUNT = 0,
+				MODIFY_USER_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'),
+				UPDATE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f')
+			WHERE USER_ID = #{userId}
+				AND UPDATE_DATE = #{updateDate}
+				AND ROLE_F = 'U'
+				AND DELETED_F = 'N'
+	</update>
+	<update id="updateUserWithPassword" parameterType="cn.com.xxxx.fmockup.validator.UserValidatorForModify">
+		UPDATE FMOCKUP.M_USER_LIST
+			SET USER_NAME = #{userName},
+				PASSWORD_AES = #{passwordAes},
+				REMARK = #{remark},
+				USER_LOCKED_F = 'Y',
+				FAILED_COUNT = 0,
+				MODIFY_USER_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'),
+				UPDATE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f')
+			WHERE USER_ID = #{userId}
+				AND UPDATE_DATE = #{updateDate}
+				AND ROLE_F = 'U'
+				AND DELETED_F = 'N'
+	</update>
+	<update id="deleteUser" parameterType="cn.com.xxxx.fmockup.validator.UserValidator">
+		UPDATE FMOCKUP.M_USER_LIST
+			SET DELETED_F = 'Y',
+				USER_LOCKED_F = 'Y',
+				MODIFY_USER_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'),
+				UPDATE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f')
+			WHERE USER_ID = #{userId}
+				AND UPDATE_DATE = #{updateDate}
+				AND USER_ID != '2023-01-01_00:00:00.000000'
+				AND DELETED_F = 'N'
+	</update>
+</mapper>

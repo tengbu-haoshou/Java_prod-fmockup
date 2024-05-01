@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.xxxx.fmockup.mapper.ZzzzMapper">
+	<select id="searchAllZzzzs" resultType="cn.com.xxxx.fmockup.entity.ZzzzEntity">
+		SELECT ROW_NUMBER() OVER (ORDER BY ZZZZ_NAME ASC) AS NO, ZZZZ_ID, ZZZZ_NAME, DELETED_F, ZZZZ_FLAG, ZZZZ_VALUE, REMARK, ADD_ZZZZ_DATE, MODIFY_ZZZZ_DATE, UPDATE_DATE
+			FROM FMOCKUP.T_ZZZZ_LIST
+			ORDER BY ZZZZ_NAME ASC
+	</select>
+	<select id="searchOneZzzz" parameterType="cn.com.xxxx.fmockup.validator.ZzzzValidator" resultType="cn.com.xxxx.fmockup.entity.ZzzzEntity">
+		SELECT ZZZZ_NAME, ZZZZ_FLAG, ZZZZ_VALUE, REMARK
+			FROM FMOCKUP.T_ZZZZ_LIST
+			WHERE ZZZZ_ID = #{zzzzId}
+				AND UPDATE_DATE = #{updateDate}
+				AND DELETED_F = 'N'
+	</select>
+	<insert id="insertZzzz" parameterType="cn.com.xxxx.fmockup.validator.ZzzzValidator">
+		INSERT INTO FMOCKUP.T_ZZZZ_LIST
+			( ZZZZ_ID, ZZZZ_NAME, ZZZZ_FLAG, ZZZZ_VALUE, REMARK, ADD_ZZZZ_DATE, MODIFY_ZZZZ_DATE, CREATE_DATE, UPDATE_DATE, USER_ID, DELETED_F )
+			VALUES( #{zzzzId}, #{zzzzName}, #{zzzzFlag}, #{zzzzValue}, #{remark}, DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'), '0000-00-00 00:00:00', DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'), DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'), #{userId}, 'N' )
+	</insert>
+	<update id="updateZzzz" parameterType="cn.com.xxxx.fmockup.validator.ZzzzValidator">
+		UPDATE FMOCKUP.T_ZZZZ_LIST
+			SET ZZZZ_NAME = #{zzzzName},
+				ZZZZ_FLAG = #{zzzzFlag},
+				ZZZZ_VALUE = #{zzzzValue},
+				REMARK = #{remark},
+				MODIFY_ZZZZ_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'),
+				UPDATE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'),
+				USER_ID = #{userId}
+			WHERE UPDATE_DATE = #{updateDate}
+				AND DELETED_F = 'N'
+	</update>
+	<update id="deleteZzzz" parameterType="cn.com.xxxx.fmockup.validator.ZzzzValidator">
+		UPDATE FMOCKUP.T_ZZZZ_LIST
+			SET DELETED_F = 'Y',
+				MODIFY_ZZZZ_DATE = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %T'),
+				UPDATE_DATE = DATE_FORMAT(CURRENT_TIMESTAMP(6), '%Y-%m-%dT%T.%f'),
+				USER_ID = #{userId}
+			WHERE UPDATE_DATE = #{updateDate}
+				AND DELETED_F = 'N'
+	</update>
+</mapper>
